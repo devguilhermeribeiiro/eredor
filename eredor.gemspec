@@ -15,7 +15,7 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = ">= 3.2.0"
 
   spec.metadata["homepage_uri"] = spec.homepage
-  spec.metadata["source_code_uri"] = "https://github.com/devguilhermeribeiiro/eredor"
+  spec.metadata["source_code_uri"] = "https://github.com/devguilhermeribeiiro/eredor/blob/main/lib/eredor.rb"
   spec.metadata["changelog_uri"] = "https://github.com/devguilhermeribeiiro/eredor/blob/main/CHANGELOG.md"
 
   # Specify which files should be added to the gem when it is released.
@@ -24,6 +24,7 @@ Gem::Specification.new do |spec|
   spec.files = IO.popen(%w[git ls-files -z], chdir: __dir__, err: IO::NULL) do |ls|
     ls.readlines("\x0", chomp: true).reject do |f|
       (f == gemspec) ||
+        f.end_with?(".gem") ||
         f.start_with?(*%w[bin/ Gemfile .gitignore .rubocop.yml])
     end
   end
