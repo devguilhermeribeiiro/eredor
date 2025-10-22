@@ -47,7 +47,7 @@ module Eredor
     private
 
     def register_route(method, path, &block)
-      raise(StandardError, 'A block must be given') unless block_given?
+      raise(StandardError, "A block must be given") unless block_given?
 
       keys = []
       regex_path = path.gsub(/:(\w+)/) do |match|
@@ -79,14 +79,41 @@ module Eredor
       # Permitir retorno flexível
       case result
       when Array || Rack::Response then result # já está no formato [status, headers, body]
-      when String then [200, { 'content-type' => 'text/html' }, [result]]
+      when String then [200, { "content-type" => "text/html" }, [result]]
       else
-        [500, { 'content-type' => 'text/plain' }, ['Internal Server Error']]
+        [500, { "content-type" => "text/plain" }, ["Internal Server Error"]]
       end
     end
 
     def not_found
-      [404, { 'content-type' => 'text/plain' }, ['Not Found']]
+      [404, { "content-type" => "text/plain" }, ["Not Found"]]
+    end
+  end
+
+  class BaseController
+    attr_reader :params, :request
+
+    def initialize(request)
+      @params = request.params
+      @request = request
+    end
+
+    def render(file)
+      content = get_view(file)
+      template = ERB.new(content)
+      template.result(binding)
+    end
+
+    private
+
+    def get_view(file)
+      File.read("../views/#{controller_name}/#{file}.html.erb")
+    end
+
+    def controller_name
+      controller = self.class.name
+      controller.gsub!(/Controller/, "")
+      controller.downcase!
     end
   end
 end
